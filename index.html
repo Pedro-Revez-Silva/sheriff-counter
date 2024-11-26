@@ -18,14 +18,13 @@
 <section>
   <!-- Player Selector -->
   <div id="player-selector">
-    <button hx-trigger="click" data-value="3">3 Players</button>
-    <button hx-trigger="click" data-value="4" class="active">4 Players</button>
-    <button hx-trigger="click" data-value="5">5 Players</button>
+    <button data-value="3">3 Players</button>
+    <button data-value="4" class="active">4 Players</button>
+    <button data-value="5">5 Players</button>
   </div>
 
   <!-- Tabs -->
-  <div id="tabs" hx-trigger="load" hx-target="#tabs">
-    <!-- htmx will dynamically load tabs -->
+  <div id="tabs">
   </div>
 
   <!-- Content Area -->

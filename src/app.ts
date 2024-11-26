@@ -491,8 +491,7 @@ class Game {
     updateScore(playerId: string, item: string, value: string) {
         const player = this.players.find((p) => p.id === playerId);
         if (player) {
-            const newValue = Math.max(0, parseInt(value) || 0);
-            player.scores[item] = newValue;
+            player.scores[item] = Math.max(0, parseInt(value) || 0);
             this.updateUI();
         }
     }
@@ -516,8 +515,7 @@ class Game {
     adjustScore(playerId: string, item: string, delta: number) {
         const player = this.players.find((p) => p.id === playerId);
         if (player) {
-            const newValue = Math.max(0, (player.scores[item] || 0) + delta);
-            player.scores[item] = newValue;
+            player.scores[item] = Math.max(0, (player.scores[item] || 0) + delta);
             this.updateUI();
         }
     }
