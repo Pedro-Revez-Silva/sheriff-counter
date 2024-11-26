@@ -1,0 +1,563 @@
+/* style.css */
+:root {
+    --primary-color: #2563eb;
+    --primary-dark: #1d4ed8;
+    --background-color: #f3f4f6;
+    --card-background: #ffffff;
+    --border-color: #e5e7eb;
+    --text-color: #1f2937;
+    --text-light: #6b7280;
+}
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.5;
+}
+
+header {
+    padding: 1rem;
+    background: var(--primary-color);
+    color: white;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+header p {
+    margin: 0.5rem 0 0;
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+/* Player Selector */
+#player-selector {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--card-background);
+    margin-bottom: 1rem;
+    overflow-x: auto;
+}
+
+#player-selector button {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    background: var(--card-background);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#player-selector button.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Tabs */
+.tabs-container {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 0.5rem;
+              padding: 0.5rem;
+              background: var(--card-background);
+              -webkit-overflow-scrolling: touch;
+          }
+
+.tabs-container::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-button {
+    padding: 0.75rem 1rem;
+    border: none;
+    background: var(--background-color);
+    color: var(--text-color);
+    border-radius: 0.375rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tab-button.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.score-total {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-top: 0.25rem;
+}
+
+/* Score Card */
+.player-score-card {
+    background: var(--card-background);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.score-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.score-row:last-child {
+    border-bottom: none;
+}
+
+.score-row.is-king {
+    background: rgba(37, 99, 235, 0.1);
+    border-radius: 0.375rem;
+}
+
+.score-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.good-name {
+    text-transform: capitalize;
+}
+
+.crown {
+    color: #fbbf24;
+}
+
+.score-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.score-adjust {
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    background: var(--card-background);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-input {
+    width: 4rem;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    text-align: center;
+}
+
+/* Totals Card */
+.totals-card {
+    background: var(--card-background);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.totals-row {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.kings-list {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-left: 1rem;
+}
+
+.queen-list {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-left: 1rem;
+}
+
+.player-total,
+.grand-total {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--border-color);
+    font-weight: 600;
+    text-align: right;
+}
+
+/* Footer */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: var(--card-background);
+    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    z-index: 100;
+}
+
+footer button {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+footer button.clear-save {
+    background: #DC2626;
+}
+
+footer button:hover {
+    background: var(--primary-dark);
+}
+
+footer button.clear-save:hover {
+    background: #B91C1C;
+}
+
+@media (max-width: 640px) {
+    .score-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .score-input-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .score-input {
+        width: 100%;
+    }
+}
+
+.player-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.edit-name-btn {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    border-radius: 0.25rem;
+}
+
+.edit-name-btn:hover {
+    opacity: 1;
+    background: var(--background-color);
+}
+
+.totals-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.totals-table th,
+.totals-table td {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.totals-table th {
+    background: var(--background-color);
+    font-weight: 600;
+}
+
+.winner-row {
+    background: rgba(37, 99, 235, 0.1);
+}
+
+.winner-announcement {
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 2rem 0;
+    padding: 1rem;
+    background: var(--background-color);
+    border-radius: 0.5rem;
+}
+
+.detailed-scores {
+    margin-top: 2rem;
+}
+
+.good-breakdown {
+    margin: 1rem 0;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.good-breakdown h4 {
+    margin: 0;
+    color: var(--text-color);
+}
+
+.kings-list {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-light);
+}
+
+h3 {
+    margin: 1.5rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.save-confirmation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #10B981;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.3s ease-out;
+    z-index: 1000;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.history-button {
+    margin-left: auto;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.history-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.history-modal-content {
+    background: white;
+    border-radius: 0.5rem;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.history-header h2 {
+    margin: 0;
+}
+
+.close-history {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.games-list {
+    padding: 1rem;
+}
+
+.game-card {
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.game-date {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.player-count {
+    color: var(--text-light);
+    font-size: 0.875rem;
+}
+
+.winner {
+    font-weight: 600;
+    margin: 0.5rem 0;
+}
+
+.players-list {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+}
+
+.game-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.load-game {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+}
+
+.delete-game {
+    background: #DC2626;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+}
+
+.no-games {
+    text-align: center;
+    color: var(--text-light);
+    padding: 2rem;
+}
+
+@media (max-width: 640px) {
+    .game-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .game-actions {
+        flex-direction: row;
+        justify-content: stretch;
+    }
+
+    .game-actions button {
+        flex: 1;
+    }
+}
+
+@media (max-width: 640px) {
+    .tab-button {
+        flex: 1 1 calc(50% - 0.5rem); /* Makes buttons take up roughly half the container width minus gap */
+        min-width: 120px; /* Ensures buttons don't get too small */
+        font-size: 0.875rem;
+        padding: 0.5rem;
+    }
+
+    /* Adjust table layout for mobile */
+    .totals-table {
+        font-size: 0.75rem; /* Smaller font size */
+    }
+
+    .totals-table th,
+    .totals-table td {
+        padding: 0.25rem; /* Reduce padding */
+    }
+
+    /* Make specific columns smaller */
+    .totals-table th:nth-child(2), /* Goods Value */
+    .totals-table td:nth-child(2),
+    .totals-table th:nth-child(3), /* King Bonuses */
+    .totals-table td:nth-child(3),
+    .totals-table th:nth-child(4), /* Queen Bonuses */
+    .totals-table td:nth-child(4),
+    .totals-table th:nth-child(5), /* Coins */
+    .totals-table td:nth-child(5) {
+        width: 15%; /* Make these columns narrower */
+    }
+
+    .totals-table th:nth-child(1), /* Player name */
+    .totals-table td:nth-child(1) {
+        width: 20%; /* Give player names a bit more space */
+    }
+
+    .totals-table th:nth-child(6), /* Total */
+    .totals-table td:nth-child(6) {
+        width: 20%; /* Give total column a bit more space */
+    }
+
+    /* Add some space between tabs and player selector */
+    #player-selector {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Make player selector buttons wrap as well */
+    #player-selector {
+        flex-wrap: wrap;
+    }
+
+    #player-selector button {
+        flex: 1 1 auto;
+        min-width: min-content;
+        font-size: 0.875rem;
+        padding: 0.5rem;
+    }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "sheriff-counter",
+  "version": "1.0.0",
+  "description": "Score counter for Sheriff of Nottingham board game",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.5.3"
+  },
+  "private": true
+}

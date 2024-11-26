@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Track your Sheriff of Nottingham games with this interactive counter.">
+  <title>Sheriff of Nottingham Counter</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/htmx.org"></script>
+  <script src="dist/app.js" type="module" defer></script>
+</head>
+<body>
+<header>
+  <h1>Sheriff of Nottingham Counter</h1>
+  <p>Track scores, prevent foul play, and enjoy the game!</p>
+</header>
+
+<section>
+  <!-- Player Selector -->
+  <div id="player-selector">
+    <button hx-trigger="click" data-value="3">3 Players</button>
+    <button hx-trigger="click" data-value="4" class="active">4 Players</button>
+    <button hx-trigger="click" data-value="5">5 Players</button>
+  </div>
+
+  <!-- Tabs -->
+  <div id="tabs" hx-trigger="load" hx-target="#tabs">
+    <!-- htmx will dynamically load tabs -->
+  </div>
+
+  <!-- Content Area -->
+  <div id="tab-content">
+    <p>Select a tab to view player stats.</p>
+  </div>
+</section>
+
+<footer>
+  <button onclick="window.game.saveGame()">Save Game</button>
+  <button onclick="window.game.clearSavedGame()" class="clear-save">Clear Save</button>
+</footer>
+</body>
+</html>
