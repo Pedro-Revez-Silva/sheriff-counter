@@ -4,7 +4,7 @@
   "description": "Score counter for Sheriff of Nottingham board game",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "npm install && tsc"
   },
   "dependencies": {},
   "devDependencies": {
