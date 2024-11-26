@@ -24,7 +24,7 @@ interface SavedGame {
 class Game {
     players: Player[];
     activePlayerCount: number;
-    activePlayerId: string;
+    activePlayerId: string | null;
     goods: Good[] = [
         { name: 'apples', type: 'regular', value: 2, kingBonus: 20, queenBonus: 10 },
         { name: 'cheese', type: 'regular', value: 3, kingBonus: 15, queenBonus: 10 },
@@ -58,7 +58,10 @@ class Game {
             const historyButton = document.createElement('button');
             historyButton.classList.add('history-button');
             historyButton.innerHTML = '📜 Games';
-            historyButton.addEventListener('click', () => this.showGameHistory());
+            historyButton.addEventListener('click', () => {
+                historyButton.classList.remove('active');
+                this.showGameHistory();
+            });
             playerSelector.appendChild(historyButton);
         }
     }
@@ -231,8 +234,10 @@ class Game {
     initializeEventListeners() {
         // Player count buttons
         document.querySelectorAll('#player-selector button').forEach(button => {
+            if (button.classList.contains('history-button')) return;
             button.addEventListener('click', (e) => {
-                const playerCount = parseInt((e.target as HTMLElement).dataset.value || '4');
+                const target = e.target as HTMLElement;
+                const playerCount = parseInt(target.dataset.value || '4');
                 this.initializePlayers(playerCount);
                 this.updatePlayerSelectorUI(playerCount);
             });
@@ -243,13 +248,17 @@ class Game {
             const target = e.target as HTMLElement;
             const tabButton = target.closest('.tab-button');
             if (tabButton) {
-                const playerId = tabButton.getAttribute('data-player');
-                if (playerId) {
-                    this.activePlayerId = playerId;
-                    this.updateUI();
-                } else if (tabButton.classList.contains('totals-tab')) {
+                if (tabButton.classList.contains('totals-tab')) {
+                    this.activePlayerId = null;  // No player is active when showing totals
                     document.getElementById('tab-content')!.innerHTML = this.getTotalsHTML();
+                } else {
+                    const playerId = tabButton.getAttribute('data-player');
+                    if (playerId) {
+                        this.activePlayerId = playerId;
+                        document.getElementById('tab-content')!.innerHTML = this.getPlayerTabHTML(playerId);
+                    }
                 }
+                this.updateTabsUI();
             }
         });
 
@@ -278,6 +287,10 @@ class Game {
 
     updatePlayerSelectorUI(activeCount: number) {
         document.querySelectorAll('#player-selector button').forEach(button => {
+            if (button.classList.contains('history-button')) {
+                button.classList.remove('active');  // Ensure history button is never active
+                return;
+            }
             const count = parseInt((button as HTMLElement).dataset.value || '4');
             button.classList.toggle('active', count === activeCount);
         });
@@ -296,11 +309,18 @@ class Game {
         return `
             <div class="tabs-container">
                 ${playerTabs}
-                <button class="tab-button totals-tab">
+                <button class="tab-button totals-tab ${this.activePlayerId === null ? 'active' : ''}">
                     Totals
                 </button>
             </div>
         `;
+    }
+
+    updateTabsUI() {
+        const tabsContainer = document.getElementById('tabs');
+        if (tabsContainer) {
+            tabsContainer.innerHTML = this.getTabsHTML();
+        }
     }
 
     getPlayerTabHTML(playerId: string): string {
@@ -565,16 +585,13 @@ class Game {
     }
 
     updateUI() {
-        // Update tabs
-        const tabsContainer = document.getElementById('tabs');
-        if (tabsContainer) {
-            tabsContainer.innerHTML = this.getTabsHTML();
-        }
-
-        // Update current tab content
+        this.updateTabsUI();
+        // Update current tab content if needed
         const tabContent = document.getElementById('tab-content');
         if (tabContent) {
-            if (this.activePlayerId) {
+            if (this.activePlayerId === null) {
+                tabContent.innerHTML = this.getTotalsHTML();
+            } else {
                 tabContent.innerHTML = this.getPlayerTabHTML(this.activePlayerId);
             }
         }
