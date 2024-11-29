@@ -130,10 +130,13 @@ class Game {
         const header = document.createElement('div');
         header.className = 'history-header';
         header.innerHTML = `
-            <h2>Game History</h2>
-            <button class="close-history">&times;</button>
-        `;
-        modalContent.appendChild(header);
+                <h2>Game History</h2>
+                <div class="history-actions">
+                    <button class="clear-save" onclick="window.game.clearSavedGame()">Clear All Games</button>
+                    <button class="close-history">&times;</button>
+                </div>
+            `;
+            modalContent.appendChild(header);
 
         // Add games list
         const gamesList = document.createElement('div');
