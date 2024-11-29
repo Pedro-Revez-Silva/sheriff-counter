@@ -395,11 +395,19 @@ class Game {
     createGoodRow(player: Player, good: Good): string {
         const isKing = this.isKingOfItem(player.id, good.name);
         const isQueen = this.isQueenOfItem(player.id, good.name);
+        const kings = this.getKingsOfItem(good.name);
+
         const countInfo = good.countAs ? ` (counts as ${good.countAs.multiplier} ${good.countAs.good})` : '';
+
+        const actualKingBonus = this.getKingBonus(player.id, good);
+        const actualQueenBonus = this.getQueenBonus(player.id, good);
+
+        const kingBonusText = good.kingBonus ? `, King +${good.kingBonus}` : '';
+        const queenBonusText = good.queenBonus ? `, Queen +${good.queenBonus}` : '';
         return `
             <div class="score-row ${isKing ? 'is-king' : ''}">
                 <label class="score-label">
-                    <span class="good-name">${good.name} (${good.value} coins${countInfo}${good.kingBonus ? `, King: +${good.kingBonus}` : ''}${good.queenBonus ? `, Queen: +${good.queenBonus}`: ''})</span>
+                    <span class="good-name">${good.name} (${good.value} coins${countInfo}${kingBonusText}${queenBonusText})</span>
                     ${isKing ? '<span class="crown">🥇</span>' : ''}
                     ${isQueen ? '<span class="crown">🥈</span>' : ''}
                 </label>
@@ -422,8 +430,8 @@ class Game {
             const goodScores = this.goods.map(good => {
                 const count = player.scores[good.name] || 0;
                 const value = count * good.value;
-                const kingBonus = this.isKingOfItem(player.id, good.name) ? (good.kingBonus || 0) : 0;
-                const queenBonus = this.isQueenOfItem(player.id, good.name) ? (good.queenBonus || 0) : 0;
+                const kingBonus = this.getKingBonus(player.id, good);
+                const queenBonus = this.getQueenBonus(player.id, good);
                 return {
                     name: good.name,
                     count,
@@ -453,77 +461,87 @@ class Game {
         const winner = playerTotals[0];
 
         return `
-            <div class="totals-card">
-                <h2>Game Totals</h2>
-                <table class="totals-table">
-                    <thead>
-                        <tr>
-                            <th>Player</th>
-                            <th>Goods Value</th>
-                            <th>King Bonuses</th>
-                            <th>Queen Bonuses</th>
-                            <th>Coins</th>
-                            <th>Total</th>
+        <div class="totals-card">
+            <h2>Game Totals</h2>
+            <table class="totals-table">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Goods Value</th>
+                        <th>King Bonuses</th>
+                        <th>Queen Bonuses</th>
+                        <th>Coins</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${playerTotals.map(pt => `
+                        <tr class="${pt === winner ? 'winner-row' : ''}">
+                            <td>${pt.player.name}</td>
+                            <td>${pt.totalGoodsValue}</td>
+                            <td>${pt.totalKingBonus}</td>
+                            <td>${pt.totalQueenBonus}</td>
+                            <td>${pt.player.coins}</td>
+                            <td><strong>${pt.totalWithCoins}</strong></td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        ${playerTotals.map(pt => `
-                            <tr class="${pt === winner ? 'winner-row' : ''}">
-                                <td>${pt.player.name}</td>
-                                <td>${pt.totalGoodsValue}</td>
-                                <td>${pt.totalKingBonus}</td>
-                                <td>${pt.totalQueenBonus}</td>
-                                <td>${pt.player.coins}</td>
-                                <td><strong>${pt.totalWithCoins}</strong></td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                
-                <div class="winner-announcement">
-                    🎉 ${winner.player.name} wins with ${winner.totalWithCoins} coins! 🎉
-                </div>
+                    `).join('')}
+                </tbody>
+            </table>
+            
+            <div class="winner-announcement">
+                🎉 ${winner.player.name} wins with ${winner.totalWithCoins} coins! 🎉
+            </div>
 
-                <div class="detailed-scores">
-                    <h3>Detailed Breakdown</h3>
-                    ${this.goods.map(good => {
+            <div class="detailed-scores">
+                <h3>Detailed Breakdown</h3>
+                ${this.goods.map(good => {
             const kings = this.getKingsOfItem(good.name);
             const queen = this.getQueenOfItem(good.name);
+            const splitKingBonus = kings.length > 0 ? Math.floor((good.kingBonus || 0) / kings.length) : 0;
+
+            // Find all players tied for queen
+            const queensTied = queen ? this.players.filter(p => {
+                const queenCount = this.getEffectiveGoodCount(queen.id, good.name);
+                return this.getEffectiveGoodCount(p.id, good.name) === queenCount;
+            }) : [];
+
+            const splitQueenBonus = queensTied.length > 0 ?
+                Math.floor((good.queenBonus || 0) / queensTied.length) : 0;
+
             return `
-                            <div class="good-breakdown">
-                                <h4>${good.name} (${good.value} coins)</h4>
-                                ${kings.length > 0 ? `
-                                    <div class="kings-list">
-                                        King${kings.length > 1 ? 's' : ''}: ${kings.map(p => p.name).join(', ')}
-                                        ${good.kingBonus ? ` (+${good.kingBonus} coins)` : ''}
-                                    </div>
-                                ` : ''}
-                                ${queen ? `
-                                    <div class="queen-list">
-                                        Queen: ${queen.name}
-                                        ${good.queenBonus ? ` (+${good.queenBonus} coins)` : ''}
-                                    </div>
-                                ` : ''}
-                            </div>
-                        `;
+                        <div class="good-breakdown">
+                            <h4>${good.name} (${good.value} coins)</h4>
+                            ${kings.length > 0 ? `
+                                <div class="kings-list">
+                                    King${kings.length > 1 ? 's' : ''}: ${kings.map(p => p.name).join(', ')}
+                                    ${good.kingBonus ? ` (+${splitKingBonus} coins ${kings.length > 1 ? `each, split from ${good.kingBonus}` : ''})` : ''}
+                                </div>
+                            ` : ''}
+                            ${queensTied.length > 0 ? `
+                                <div class="queen-list">
+                                    Queen${queensTied.length > 1 ? 's' : ''}: ${queensTied.map(p => p.name).join(', ')}
+                                    ${good.queenBonus ? ` (+${splitQueenBonus} coins ${queensTied.length > 1 ? `each, split from ${good.queenBonus}` : ''})` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
         }).join('')}
-                </div>
             </div>
-        `;
+        </div>
+    `;
     }
 
     calculatePlayerTotalScore(playerId: string): number {
         const player = this.players.find(p => p.id === playerId);
         if (!player) return 0;
 
-        const goodsValue = this.goods.reduce((total, good) => {
+        return this.goods.reduce((total, good) => {
             const count = player.scores[good.name] || 0;
             const value = count * good.value;
-            const kingBonus = this.isKingOfItem(playerId, good.name) ? (good.kingBonus || 0) : 0;
-            return total + value + kingBonus;
-        }, 0);
-
-        return goodsValue + player.coins;
+            const kingBonus = this.getKingBonus(playerId, good);
+            const queenBonus = this.getQueenBonus(playerId, good);
+            return total + value + kingBonus + queenBonus;
+        }, player.coins);
     }
 
     updateScore(playerId: string, item: string, value: string) {
@@ -661,6 +679,28 @@ class Game {
             console.error('Failed to clear saved game:', error);
             alert('Failed to clear saved game');
         }
+    }
+
+    getKingBonus(playerId: string, good: Good): number {
+        if(!good.kingBonus) return 0;
+        const kings = this.getKingsOfItem(good.name);
+        if(!kings.some(p => p.id === playerId)) return 0;
+
+        return Math.floor(good.kingBonus / kings.length);
+    }
+    getQueenBonus(playerId: string, good: Good): number {
+        if(!good.queenBonus) return 0;
+        const queen = this.getQueenOfItem(good.name);
+        if(!queen || queen.id !== playerId) return 0;
+
+        const queens = this.players.filter(p => {
+            if(p.id === queen.id) return true;
+            const effectiveCount = this.getEffectiveGoodCount(p.id, good.name);
+            const queenCount = this.getEffectiveGoodCount(queen.id, good.name);
+            return effectiveCount === queenCount;
+        })
+
+        return Math.floor(good.queenBonus / queens.length);
     }
 }
 
