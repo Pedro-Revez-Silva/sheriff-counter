@@ -58,6 +58,16 @@ header p {
     transition: all 0.2s;
 }
 
+#player-selector a {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    background: var(--card-background);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
 #player-selector button.active {
     background: var(--primary-color);
     color: white;
@@ -65,6 +75,7 @@ header p {
 }
 
 /* Action Buttons in player selector */
+
 .action-button {
     margin-left: auto;
     background: var(--primary-color);
@@ -545,4 +556,6 @@ h3 {
         font-size: 0.875rem;
         padding: 0.5rem;
     }
+
+
 }

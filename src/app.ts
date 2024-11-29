@@ -4,6 +4,11 @@ interface Good {
     value: number;
     kingBonus?: number;
     queenBonus?: number;
+    minPlayers?: number;
+    countAs?: {
+        good: 'apples'| 'cheese' | 'bread' | 'chickens';
+        multiplier: number;
+    }
 }
 
 interface Player {
@@ -28,19 +33,21 @@ class Game {
     goods: Good[] = [
         { name: 'apples', type: 'regular', value: 2, kingBonus: 20, queenBonus: 10 },
         { name: 'cheese', type: 'regular', value: 3, kingBonus: 15, queenBonus: 10 },
-        { name: 'bread', type: 'regular', value: 3, kingBonus: 15, queenBonus: 10 },
+        { name: 'bread', type: 'regular', value: 3, kingBonus: 15, queenBonus: 10, minPlayers: 4 },
         { name: 'chickens', type: 'regular', value: 4, kingBonus: 10, queenBonus: 5 },
+
         { name: 'pepper', type: 'contraband', value: 6 },
         { name: 'mead', type: 'contraband', value: 7 },
         { name: 'silk', type: 'contraband', value: 8},
         { name: 'crossbow', type: 'contraband', value: 9 },
-        { name: 'green apples', type: 'royal', value: 4 },
-        { name: 'golden apples', type: 'royal', value: 6 },
-        { name: 'gouda cheese', type: 'royal', value: 6 },
-        { name: 'bleu cheese', type: 'royal', value: 9 },
-        { name: 'rye bread', type: 'royal', value: 6 },
-        { name: 'pumpernickel bread', type: 'royal', value: 9 },
-        { name: 'royal rooster', type: 'royal', value: 8 },
+
+        { name: 'green apples', type: 'royal', value: 4, minPlayers: 4, countAs: { good: 'apples', multiplier: 2 } },
+        { name: 'golden apples', type: 'royal', value: 6, minPlayers: 4, countAs: { good: 'apples', multiplier: 3 } },
+        { name: 'gouda cheese', type: 'royal', value: 6, minPlayers: 4, countAs: { good: 'cheese', multiplier: 2 } },
+        { name: 'bleu cheese', type: 'royal', value: 9, minPlayers: 4, countAs: { good: 'cheese', multiplier: 3 } },
+        { name: 'rye bread', type: 'royal', value: 6, minPlayers: 4, countAs: { good: 'bread', multiplier: 2 } },
+        { name: 'pumpernickel bread', type: 'royal', value: 9, minPlayers: 4, countAs: { good: 'bread', multiplier: 3 } },
+        { name: 'royal rooster', type: 'royal', value: 8, minPlayers: 4, countAs: { good: 'chickens', multiplier: 2 } },
     ];
 
     constructor() {
@@ -221,12 +228,17 @@ class Game {
             , players[0]);
     }
 
+    getAvailableGoods(): Good[] {
+        return this.goods.filter(good => !good.minPlayers || good.minPlayers <= this.activePlayerCount);
+    }
+
     initializePlayers(count: number) {
         this.activePlayerCount = count;
+        const availableGoods = this.getAvailableGoods();
         this.players = Array.from({ length: count }, (_, i) => ({
             id: `player${i + 1}`,
             name: `Player ${i + 1}`,
-            scores: this.goods.reduce((acc, good) => ({...acc, [good.name]: 0}), {}),
+            scores: availableGoods.reduce((acc, good) => ({...acc, [good.name]: 0}), {}),
             coins: 0
         }));
         this.activePlayerId = 'player1';
@@ -330,6 +342,8 @@ class Game {
         const player = this.players.find((p) => p.id === playerId);
         if (!player) return `<p>Player not found.</p>`;
 
+        const availableGoods = this.getAvailableGoods();
+
         return `
             <div class="player-score-card">
                 <div class="player-header">
@@ -354,19 +368,19 @@ class Game {
                     </div>
                 </div>
                 <h3>Regular Goods</h3>
-                ${this.goods
+                ${availableGoods
             .filter(good => good.type === 'regular')
             .map(good => this.createGoodRow(player, good))
             .join('')}
                 
                 <h3>Contraband</h3>
-                ${this.goods
+                ${availableGoods
             .filter(good => good.type === 'contraband')
             .map(good => this.createGoodRow(player, good))
             .join('')}
                 
                 <h3>Royal Goods</h3>
-                ${this.goods
+                ${availableGoods
             .filter(good => good.type === 'royal')
             .map(good => this.createGoodRow(player, good))
             .join('')}
@@ -381,10 +395,11 @@ class Game {
     createGoodRow(player: Player, good: Good): string {
         const isKing = this.isKingOfItem(player.id, good.name);
         const isQueen = this.isQueenOfItem(player.id, good.name);
+        const countInfo = good.countAs ? ` (counts as ${good.countAs.multiplier} ${good.countAs.good})` : '';
         return `
             <div class="score-row ${isKing ? 'is-king' : ''}">
                 <label class="score-label">
-                    <span class="good-name">${good.name} (${good.value} coins${good.kingBonus ? `, King: +${good.kingBonus}` : ''}${good.queenBonus ? `, Queen: +${good.queenBonus}`: ''})</span>
+                    <span class="good-name">${good.name} (${good.value} coins${countInfo}${good.kingBonus ? `, King: +${good.kingBonus}` : ''}${good.queenBonus ? `, Queen: +${good.queenBonus}`: ''})</span>
                     ${isKing ? '<span class="crown">🥇</span>' : ''}
                     ${isQueen ? '<span class="crown">🥈</span>' : ''}
                 </label>
@@ -552,6 +567,20 @@ class Game {
         return this.players.reduce((sum, player) => sum + this.calculateTotal(player.id), 0);
     }
 
+    getEffectiveGoodCount(playerId: string, goodType: string): number {
+        const player = this.players.find(p => p.id === playerId);
+        if (!player) return 0;
+        let count = player.scores[goodType] || 0;
+        this.goods
+            .filter(good => good.type === 'royal' && good.countAs?.good === goodType)
+            .forEach(royalGood => {
+                const royalCount = player.scores[royalGood.name] || 0;
+                count += royalCount * (royalGood.countAs?.multiplier || 1);
+            });
+
+        return count;
+    }
+
     isKingOfItem(playerId: string, item: string): boolean {
         const kings = this.getKingsOfItem(item);
         return kings.some(p => p.id === playerId);
@@ -562,29 +591,32 @@ class Game {
         return queen?.id === playerId;
     }
 
+
     getQueenOfItem(item: string): Player | undefined {
-        // Get all players who have this item
-        const playersWithItem = this.players.filter(player => player.scores[item] !== undefined);
+        const playersWithItem = this.players.filter(
+            player => this.getEffectiveGoodCount(player.id, item) > 0
+        );
 
-        // If we have fewer than 2 players with this item, there can't be a queen
-        if (playersWithItem.length < 2) {
-            return undefined;
-        }
+        if (playersWithItem.length < 2) return undefined;
 
-        // Sort players by their score for this item in descending order
-        const sortedPlayers = playersWithItem.sort((a, b) => b.scores[item] - a.scores[item]);
+        const sortedPlayers = playersWithItem.sort(
+            (a, b) => this.getEffectiveGoodCount(b.id, item) - this.getEffectiveGoodCount(a.id, item)
+        );
 
-        // Get the highest score
-        const highestScore = sortedPlayers[0].scores[item];
+        const highestScore = this.getEffectiveGoodCount(sortedPlayers[0].id, item);
 
-        // Find the first player with a different (lower) score
-        // This will be our queen
-        return sortedPlayers.find(player => player.scores[item] < highestScore);
+        return sortedPlayers.find(
+            player => this.getEffectiveGoodCount(player.id, item) < highestScore
+        );
     }
 
     getKingsOfItem(item: string): Player[] {
-        const maxScore = Math.max(...this.players.map(p => p.scores[item]));
-        return maxScore > 0 ? this.players.filter(p => p.scores[item] === maxScore) : [];
+        const maxScore = Math.max(
+            ...this.players.map(p => this.getEffectiveGoodCount(p.id, item))
+        );
+        return maxScore > 0 ?
+            this.players.filter(p => this.getEffectiveGoodCount(p.id, item) === maxScore)
+            : [];
     }
 
     updateUI() {
