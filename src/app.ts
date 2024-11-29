@@ -302,8 +302,8 @@ class Game {
 
     updatePlayerSelectorUI(activeCount: number) {
         document.querySelectorAll('#player-selector button').forEach(button => {
-            if (button.classList.contains('history-button')) {
-                button.classList.remove('active');  // Ensure history button is never active
+            if (button.classList.contains('history-button') || button.classList.contains('save-button')) {
+                button.classList.remove('active');
                 return;
             }
             const count = parseInt((button as HTMLElement).dataset.value || '4');

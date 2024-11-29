@@ -246,8 +246,8 @@ class Game {
     }
     updatePlayerSelectorUI(activeCount) {
         document.querySelectorAll('#player-selector button').forEach(button => {
-            if (button.classList.contains('history-button')) {
-                button.classList.remove('active'); // Ensure history button is never active
+            if (button.classList.contains('history-button') || button.classList.contains('save-button')) {
+                button.classList.remove('active');
                 return;
             }
             const count = parseInt(button.dataset.value || '4');
@@ -333,10 +333,7 @@ class Game {
     createGoodRow(player, good) {
         const isKing = this.isKingOfItem(player.id, good.name);
         const isQueen = this.isQueenOfItem(player.id, good.name);
-        const kings = this.getKingsOfItem(good.name);
         const countInfo = good.countAs ? ` (counts as ${good.countAs.multiplier} ${good.countAs.good})` : '';
-        const actualKingBonus = this.getKingBonus(player.id, good);
-        const actualQueenBonus = this.getQueenBonus(player.id, good);
         const kingBonusText = good.kingBonus ? `, King +${good.kingBonus}` : '';
         const queenBonusText = good.queenBonus ? `, Queen +${good.queenBonus}` : '';
         return `
