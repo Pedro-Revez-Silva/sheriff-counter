@@ -395,12 +395,8 @@ class Game {
     createGoodRow(player: Player, good: Good): string {
         const isKing = this.isKingOfItem(player.id, good.name);
         const isQueen = this.isQueenOfItem(player.id, good.name);
-        const kings = this.getKingsOfItem(good.name);
 
         const countInfo = good.countAs ? ` (counts as ${good.countAs.multiplier} ${good.countAs.good})` : '';
-
-        const actualKingBonus = this.getKingBonus(player.id, good);
-        const actualQueenBonus = this.getQueenBonus(player.id, good);
 
         const kingBonusText = good.kingBonus ? `, King +${good.kingBonus}` : '';
         const queenBonusText = good.queenBonus ? `, Queen +${good.queenBonus}` : '';
